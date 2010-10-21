@@ -1,4 +1,4 @@
-package org.drools.guvnor.plugin;
+package org.drools.guvnor.plugin.data;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,7 +8,7 @@ package org.drools.guvnor.plugin;
  * To change this template use File | Settings | File Templates.
  */
 
-public class DataModel {
+public class AbstractDataModel {
 
     /* @parameter property="artifactId" */
     private String _artifactId;
@@ -16,8 +16,6 @@ public class DataModel {
     /* @parameter property="groupId" */
     private String _groupId;
 
-    /* @parameter property="version" */
-    private  Number _version;
 
     public String getArtifactId() {
         return _artifactId;
@@ -33,22 +31,5 @@ public class DataModel {
 
     public void setGroupId(String _groupId) {
         this._groupId = _groupId;
-    }
-
-    public Number getVersion() {
-        return _version;
-    }
-
-    public void setVersion(Number _version) {
-        this._version = _version;
-    }
-
-    @Override
-    public String toString() {
-        return "DataModel{" +
-            "artifactId='" + _artifactId + '\'' +
-            ", groupId='" + _groupId + '\'' +
-            ", version=" + _version +
-            '}';
-    }
+    }   
 }

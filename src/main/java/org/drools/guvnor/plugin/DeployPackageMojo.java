@@ -1,46 +1,31 @@
 package org.drools.guvnor.plugin;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.net.URL;
-import java.util.List;
-
 /**
- * "deploy-package" goal which deploys configured artifacts into the Drools Guvnor
- * server specified by the URL, "url".
+ * "deployPackage" mojo which deploys all artifacts to the package, "package"
+ * at the Guvnor instance defined by URL "url".
  *
- * What is a package?  Packages consits of resources (a list of build path values,
- * generally pointing to rule-flows, drools-rules-files and dsl mappings) and
- * data models, defined as bindable artifacts in a maven context.
+ * @goal deployPackage
  *
- * WEBDAV repository.
- *
- * @goal deploy-package
- * 
  * @phase process-sources
  */
-public class DeployPackageMojo extends AbstractMojo
-{
-    
-    /* @parameter */
-    public URL guvnorURL;
 
-    /* @parameter */
-    public List resources;
+public class DeployPackageMojo extends AbstractGuvnorMojo {
 
-    /* @parameter */
-    public DataModel[] models;
+    DeletePackageMojo delete = new DeletePackageMojo();
+    CreatePackageMojo create = new CreatePackageMojo();
+    CompilePackageMojo compile = new CompilePackageMojo();
 
     public void execute() throws MojoExecutionException {
+        /* configure */
+        delete.configure(this);
+        create.configure(this);
+        compile.configure(this);
 
-        System.out.println ("guvnorURL: " + guvnorURL);
-        for (Object obj : resources) {
-            System.out.println ("resource: " + obj);
-        }
-
-        for (DataModel model : models) {
-            System.out.println ("model: " + model);
-        }
+        /* Deploy */
+        delete.execute();
+        create.execute();
+        compile.execute();
     }
 }
