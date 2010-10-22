@@ -32,6 +32,10 @@ public class DeletePackageMojo extends AbstractGuvnorMojo {
         }
 
         if (!method.succeeded())
-            throw new MojoExecutionException ("DeleteMethod failed!");
+            try {
+                throw new MojoExecutionException (method.getResponseException().toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 }

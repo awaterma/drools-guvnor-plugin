@@ -15,6 +15,8 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.drools.guvnor.plugin.data.AbstractDataModel;
 import org.drools.guvnor.plugin.data.POJODataModel;
 
@@ -39,7 +41,15 @@ import java.util.Set;
  * @phase process-sources
  */
 public class CreatePackageMojo extends AbstractGuvnorMojo {
-    
+
+    /*
+        @parameter default-value="${project}"
+    */
+    private MavenProject project;   
+
+    /** @component */
+    private MavenProjectBuilder mavenProjectBuilder;    
+
     private Set<Artifact> resolvedModels;
 
     public void execute() throws MojoExecutionException {
@@ -47,8 +57,9 @@ public class CreatePackageMojo extends AbstractGuvnorMojo {
         /* First, load all defined models from the repository */
         Set<Artifact> artifacts = project.getArtifacts();
 
-        /* Filter out resolved models from project artifacts */
         try {
+
+            /* Filter out resolved models from project artifacts */            
             for (AbstractDataModel model : models) {
                 if (model instanceof POJODataModel) {
                     for (Artifact artifact : artifacts) {

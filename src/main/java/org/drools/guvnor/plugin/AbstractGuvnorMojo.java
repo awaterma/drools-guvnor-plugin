@@ -12,26 +12,10 @@ import java.util.List;
 
 /**
  * AbstractMojo class for drools-guvnor-plugin.
+ *
+ * @RequiresProject true
  */
 public abstract class AbstractGuvnorMojo extends AbstractMojo  {
-
-    public void configure(AbstractGuvnorMojo mojo) {
-        this.project = mojo.project;
-        this.guvnorURL = mojo.guvnorURL;
-        this.username = mojo.username;
-        this.password = mojo.password;
-        this.packageName= mojo.packageName;
-        this.resources = mojo.resources;
-        this.models = mojo.models;
-    }
-
-    /**
-    * The maven project.
-    *
-    *  @required 
-    *  @parameter
-    */
-    public MavenProject project;
 
     /*  @required
         @parameter */
@@ -53,6 +37,18 @@ public abstract class AbstractGuvnorMojo extends AbstractMojo  {
     public List<String> resources;
 
     /* @parameter */
-    public AbstractDataModel[] models;    
+    public AbstractDataModel[] models;
+
+    /*  Configure this project to reflect the common
+        values set into the Abstraction instance.
+     */
+    public void configure(AbstractGuvnorMojo mojo) {
+        this.guvnorURL = mojo.guvnorURL;
+        this.username = mojo.username;
+        this.password = mojo.password;
+        this.packageName= mojo.packageName;
+        this.resources = mojo.resources;
+        this.models = mojo.models;
+    }    
 
 }
