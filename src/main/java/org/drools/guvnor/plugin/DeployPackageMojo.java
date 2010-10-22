@@ -8,7 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  *
  * @goal deployPackage
  *
- * @phase process-sources
+ * @phase package
  */
 
 public class DeployPackageMojo extends AbstractGuvnorMojo {

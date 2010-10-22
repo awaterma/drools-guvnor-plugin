@@ -38,7 +38,7 @@ public class DeployPackageMojoTest extends AbstractMojoTestCase {
     }
 
 
-    /** Not working yet, issues with MavenProject not being pushed into top-level mojo.
+    /** Not working yet, issues with MavenProject not being pushed into top-level mojo. */
     @Test
     public void testDeployPackage () throws Exception {
         File testPom = new File( getBasedir(), "src/test/resources/testPom.xml" );
@@ -46,7 +46,6 @@ public class DeployPackageMojoTest extends AbstractMojoTestCase {
         assertNotNull( mojo );
         mojo.execute();
     }
-    */
 
 
     @After

@@ -7,6 +7,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.jackrabbit.webdav.Status;
 import org.apache.jackrabbit.webdav.client.methods.PutMethod;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -17,12 +18,14 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.guvnor.plugin.data.AbstractDataModel;
 import org.drools.guvnor.plugin.data.POJODataModel;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,75 +41,72 @@ import java.util.Set;
  *
  * @goal createPackage
  * 
- * @phase process-sources
+ * @phase package
  */
 public class CreatePackageMojo extends AbstractGuvnorMojo {
 
     /*
+        @required
         @parameter default-value="${project}"
     */
-    private MavenProject project;   
-
-    /** @component */
-    private MavenProjectBuilder mavenProjectBuilder;    
-
-    private Set<Artifact> resolvedModels;
+    private MavenProject project;
 
     public void execute() throws MojoExecutionException {
-
-        /* First, load all defined models from the repository */
-        Set<Artifact> artifacts = project.getArtifacts();
+        Set<Artifact> resolvedModels = new HashSet<Artifact>();
+        
+        HttpClient client = new HttpClient();
+        Credentials credentials = new UsernamePasswordCredentials(username, password);
+        client.getState().setCredentials(AuthScope.ANY, credentials);
 
         try {
-
-            /* Filter out resolved models from project artifacts */            
-            for (AbstractDataModel model : models) {
-                if (model instanceof POJODataModel) {
-                    for (Artifact artifact : artifacts) {
-                        if (artifact.getArtifactId().equals(model.getArtifactId()) &&
-                                artifact.getGroupId().equals(model.getGroupId())) {
-                            resolvedModels.add(artifact);
-                            break;
+            /* Artifact filter for defined models */
+            if (models != null && models.length > 0) {
+                Set<Artifact> artifacts = project.getArtifacts();
+                for (AbstractDataModel model : models) {
+                    if (model instanceof POJODataModel) {
+                        for (Artifact artifact : artifacts) {
+                            if (artifact.getArtifactId().equals(model.getArtifactId()) &&
+                                    artifact.getGroupId().equals(model.getGroupId())) {
+                                resolvedModels.add(artifact);
+                                break;
+                            }
                         }
                     }
                 }
             }
 
-            PutMethod method = null;
-
-            HttpClient client = new HttpClient();
-            Credentials credentials = new UsernamePasswordCredentials(username, password);
-            client.getState().setCredentials(AuthScope.ANY, credentials);
-            method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName);
+            /* Create Package */
+            PutMethod method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName);
             client.executeMethod(method);
 
             if (!method.succeeded())
-                    throw new MojoExecutionException ("PutMethod failed!");
+                throw new MojoExecutionException (method.getResponseException().toString());
 
-            /* Now that the package has been created, push up the resources and models */
             for (String resource : resources) {
                 File f = new File (resource);
                 if (!f.exists())
                     throw new MojoExecutionException ("Bad resource: " + resource);
                 RequestEntity requestEntity = new InputStreamRequestEntity(new FileInputStream(f));
+                method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName + "/" + f.getName());
                 method.setRequestEntity(requestEntity);
                 client.executeMethod(method);
                 if (!method.succeeded())
-                    throw new MojoExecutionException ("PutMethod failed!");
+                    throw new MojoExecutionException (method.getResponseException().toString());
             }
 
             for (Artifact artifact : resolvedModels) {
                 File f = artifact.getFile();
                 if (!f.exists())
-                    throw new MojoExecutionException ("Bad model: " + artifact.toString());                
+                    throw new MojoExecutionException ("Bad model: " + artifact.toString());
                 RequestEntity requestEntity = new InputStreamRequestEntity(new FileInputStream(f));
+                method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName);
                 method.setRequestEntity(requestEntity);
                 client.executeMethod(method);
                 if (!method.succeeded())
-                    throw new MojoExecutionException ("PutMethod failed!");
+                    throw new MojoExecutionException (method.getResponseException().toString());
             }
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } 
+            e.printStackTrace();
+        }
     }
 }

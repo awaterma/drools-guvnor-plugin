@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @goal deletePackage
  *
- * @phase process-sources
+ * @phase package
  */
 public class DeletePackageMojo extends AbstractGuvnorMojo {
     
