@@ -23,7 +23,7 @@ public class DeletePackageMojo extends AbstractGuvnorMojo {
         HttpClient client = new HttpClient();
         Credentials creds = new UsernamePasswordCredentials(username, password);
         client.getState().setCredentials(AuthScope.ANY, creds);
-        DeleteMethod method = new DeleteMethod(guvnorURL.toExternalForm() + "/" + packageName);
+        DeleteMethod method = new DeleteMethod(guvnorURL.toExternalForm() + RestQuery + "/" + packageName);
 
         try {
             client.executeMethod(method);
@@ -37,5 +37,5 @@ public class DeletePackageMojo extends AbstractGuvnorMojo {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-    }
+    }    
 }

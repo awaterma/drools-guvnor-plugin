@@ -17,8 +17,27 @@ import java.util.List;
  */
 public abstract class AbstractGuvnorMojo extends AbstractMojo  {
 
+    /*
+        REST API query string.
+     */
+    public final static String RestQuery = "/api/packages";
+
+    /*
+        REST Action query string.
+     */
+    public final static String ActionQuery = "/actions";
+
+    /*
+     *  @required
+     *  @parameter expression="${project}"
+     *  @readonly
+    */
+    public MavenProject project;    
+
     /*  @required
-        @parameter */
+        @parameter
+
+        The URL to Drools Guvnor. */
     public URL guvnorURL;
 
     /*  @required
@@ -49,6 +68,5 @@ public abstract class AbstractGuvnorMojo extends AbstractMojo  {
         this.packageName= mojo.packageName;
         this.resources = mojo.resources;
         this.models = mojo.models;
-    }    
-
+    }
 }

@@ -18,6 +18,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.drools.guvnor.plugin.data.AbstractDataModel;
 import org.drools.guvnor.plugin.data.POJODataModel;
@@ -39,17 +40,13 @@ import java.util.Set;
  *
  * WEBDAV repository.
  *
+ * @requiresDependencyResolution
+ *
  * @goal createPackage
  * 
  * @phase package
  */
 public class CreatePackageMojo extends AbstractGuvnorMojo {
-
-    /*
-        @required
-        @parameter default-value="${project}"
-    */
-    private MavenProject project;
 
     public void execute() throws MojoExecutionException {
         Set<Artifact> resolvedModels = new HashSet<Artifact>();
@@ -76,7 +73,7 @@ public class CreatePackageMojo extends AbstractGuvnorMojo {
             }
 
             /* Create Package */
-            PutMethod method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName);
+            PutMethod method = new PutMethod(guvnorURL.toExternalForm() + RestQuery + "/" + packageName);
             client.executeMethod(method);
 
             if (!method.succeeded())
@@ -87,7 +84,7 @@ public class CreatePackageMojo extends AbstractGuvnorMojo {
                 if (!f.exists())
                     throw new MojoExecutionException ("Bad resource: " + resource);
                 RequestEntity requestEntity = new InputStreamRequestEntity(new FileInputStream(f));
-                method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName + "/" + f.getName());
+                method = new PutMethod(guvnorURL.toExternalForm() + RestQuery + "/" + packageName + "/" + f.getName());
                 method.setRequestEntity(requestEntity);
                 client.executeMethod(method);
                 if (!method.succeeded())
@@ -99,7 +96,7 @@ public class CreatePackageMojo extends AbstractGuvnorMojo {
                 if (!f.exists())
                     throw new MojoExecutionException ("Bad model: " + artifact.toString());
                 RequestEntity requestEntity = new InputStreamRequestEntity(new FileInputStream(f));
-                method = new PutMethod(guvnorURL.toExternalForm() + "/" + packageName);
+                method = new PutMethod(guvnorURL.toExternalForm() + RestQuery + "/" + packageName);
                 method.setRequestEntity(requestEntity);
                 client.executeMethod(method);
                 if (!method.succeeded())
